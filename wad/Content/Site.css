@@ -1,5 +1,5 @@
 ﻿body {
-    font-size: 0.85em;
+    font-size: 1.25em;
     font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;
     color: #232323;
     background-color: #fff;
@@ -58,4 +58,48 @@ textarea {
 
 .validation-summary-valid {
     display: none;
+}
+
+
+/* Styles for the rest of the website - customizations
+-----------------------------------------------------------*/
+html, body {
+    height: 100%;
+    background-color: #fafafa;
+}
+body {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 70px rgba(0, 0, 0, 0.25) inset;
+}
+.site-wrapper {
+    display: table;
+    height: 100%;
+    min-height: 100%;
+    width: 100%;
+}
+.site-wrapper-inner {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+h1.heading {
+    text-align: center;
+    margin-bottom: 80px;
+    font-size: 5em;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+form#inputForm {
+    margin-bottom: 200px;
+}
+form#inputForm .form-inline {
+    text-align: center;
+}
+form#inputForm button.btn-primary {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+form#inputForm button.btn-success {
+    width: 100%;
 }
