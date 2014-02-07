@@ -95,11 +95,20 @@ form#inputForm {
 form#inputForm .form-inline {
     text-align: center;
 }
+form#inputForm .help-block {
+    font-size: 0.9em;
+    margin-bottom: 20px;
+}
+form#inputForm input#fileUpload {
+    visibility: hidden;
+    height: 0;
+}
 form#inputForm button.btn-primary {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 2px;
+    right: 2px;
 }
-form#inputForm button.btn-success {
-    width: 100%;
+form#inputForm button:hover,
+form#inputForm button:focus {
+    outline: none;
 }

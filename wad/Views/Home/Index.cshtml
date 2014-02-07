@@ -1,4 +1,4 @@
-﻿@model dynamic
+﻿@model wad.Models.HomeModel
 
 @{
     ViewBag.Title = "Home";
@@ -12,35 +12,43 @@
                 <div class="col-md-6 col-md-offset-4 col-xs-12">
                     
                     <h1 class="heading">MIVE</h1>
+                    
+                    @using (Html.BeginForm("ProcessForm", "Home", FormMethod.Post, new { @id = "inputForm", role = "form", enctype = "multipart/form-data" }))
+                    {
+                        @Html.AntiForgeryToken()
 
-                    <form role="form" id="inputForm">
                         <div class="form-group has-feedback">
-                            <input type="url" class="form-control" id="inputSource" name="inputSource" placeholder="Enter a valid url here">
-                            <button type="button" class="btn btn-primary"><i class="glyphicon glyphicon-circle-arrow-right"></i></button>
+                            @Html.TextBoxFor(m => m.Url, new { @class = "form-control", @id = "inputSource", @placeholder = "Enter a valid url here", @type = "url" })
+                            <button type="button" id="submitUrl" class="btn btn-sm btn-primary"><i class="glyphicon glyphicon-circle-arrow-right"></i></button>
                         </div>
                         <div class="form-group form-inline">
                             <div class="radio radio-inline">
                                 <label>
-                                    <input type="radio" name="inputType" value="microData">
+                                    @Html.RadioButtonFor(m => m.Type, wad.Models.TypeModel.MicroData)
                                     microData
                                 </label>
                             </div>
                             <div class="radio radio-inline">
                                 <label>
-                                    <input type="radio" name="inputType" value="microFormat">
+                                    @Html.RadioButtonFor(m => m.Type, wad.Models.TypeModel.MicroFormat)
                                     microFormat
                                 </label>
                             </div>
                             <div class="radio radio-inline">
                                 <label>
-                                    <input type="radio" name="inputType" value="RDFa">
+                                    @Html.RadioButtonFor(m => m.Type, wad.Models.TypeModel.Rdfa)
                                     RDFa
                                 </label>
                             </div>
+                            
+                            <span class="help-block">
+                                @Html.ValidationMessageFor(m => m.Type)
+                            </span>
                         </div>
-                        <br/>
-                        <button type="button" class="btn btn-sm btn-success"><i class="glyphicon glyphicon-circle-arrow-up"></i> Upload</button>
-                    </form>
+                        
+                        <input type="file" name="fileUpload" id="fileUpload" />
+                        <button type="button" id="submitFile" class="btn btn-sm btn-success btn-block"><i class="glyphicon glyphicon-circle-arrow-up"></i> Upload</button>
+                    }
 
                 </div>
             </div>
@@ -48,3 +56,28 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $('#submitUrl').on('click', function () {
+            $('#inputSource').attr('type', 'url');
+            $('#inputForm').submit();
+        });
+
+        $('#submitFile').on('click', function () {
+            $('#inputSource').attr('type', 'text');
+            $('#fileUpload').trigger('click');
+        });
+
+        $('#fileUpload').on('change', function () {
+            if ($(this).val().match(new RegExp(".(html|htm|xhtml)$", "i"))) {
+                $('#inputSource').val($(this).val());
+                $('#inputForm').submit();
+            }
+            else {
+                $('.help-block').html('<span data-valmsg-replace="true" data-valmsg-for="Type" class="field-validation-error"><span for="fileUpload" generated="true" class="">The selected file type is invalid.</span></span>')
+            }
+        });
+    </script>
+}

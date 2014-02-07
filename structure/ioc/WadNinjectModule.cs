@@ -23,7 +23,7 @@ namespace structure.ioc
 
             //Serv's
             this.Bind<IUserSessionService>().To<UserSessionService>().InRequestScope();
-
+            this.Bind<IMembershipService>().To<MembershipService>().InRequestScope();
         }
     }
 
