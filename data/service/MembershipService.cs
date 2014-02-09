@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Security;
 using WebMatrix.WebData;
+using data.entity;
 
 namespace data.service
 {
@@ -62,6 +63,11 @@ namespace data.service
         {
             var session = _userSessionService.RetrieveUserSession(userhash);
             return session.UserId;
+        }
+
+        public UserSession GetUserSession(string userhash)
+        {
+            return _userSessionService.RetrieveUserSession(userhash);
         }
     }
 }
