@@ -1,0 +1,184 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Snippet editor";
+}
+
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">MIVE</a>
+        </div>
+        
+        <div class="collapse navbar-collapse">
+            <div class="navbar-left">
+                <a class="btn btn-success navbar-btn">Save</a>
+            </div>
+            <div class="navbar-right">
+                <a class="btn btn-info navbar-btn">Export</a>
+                &nbsp; &nbsp;
+                <div class="btn-group">
+                  <a class="btn btn-primary navbar-btn dropdown-toggle" data-toggle="dropdown">
+                    Visualizer <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#" id="goVisualizerTree">Tree</a></li>
+                    <li><a href="#" id="goVisualizerHyperTree">HyperTree</a></li>
+                    <li><a href="#" id="goVisualizerGraph">Graph</a></li>
+                  </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        
+        <div class="editor-preview">
+            <iframe id="livePreviewer" sandbox="allow-same-origin "></iframe>
+        </div>
+        
+        <div class="editor-visualizer">
+
+            <div id="id-list"></div>
+            <div id="infovis"></div>    
+            <div id="log"></div>
+            <div id="inner-details"></div>
+
+            <input type="radio" id="r-left" name="orientation" checked="checked" value="left" />
+            <input type="radio" id="r-top" name="orientation" value="top" />
+            <input type="radio" id="r-bottom" name="orientation" value="bottom" />
+            <input type="radio" id="r-right" name="orientation" value="right" />
+            <input type="radio" id="s-normal" name="selection" checked="checked" value="normal" />
+            <input type="radio" id="s-root" name="selection" value="root" />
+                
+        </div>
+
+        <div class="editor-textarea">
+            <code id="liveEditor"></code>
+        </div>
+        
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/Scripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/Scripts/ace/ext-language_tools.js"></script>
+    <script src="/Scripts/jit/jit.js" type="text/javascript"></script>
+
+    <script src="/Scripts/myEditor.js"></script>
+
+    <script type="text/javascript">
+        ace.require("ace/ext/language_tools");
+
+        var jsonRdf = '';
+        var oldHtml = '';
+        var langTools = ace.require("ace/ext/language_tools");
+        var editor = ace.edit("liveEditor");
+
+        editor.setTheme("ace/theme/twilight");
+        editor.getSession().setMode("ace/mode/html");
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true
+        });
+
+        editor.getSession().on('change', function (e) {
+            updateFrame();
+        });
+
+        function updateFrame() {
+            var livePreviewer = document.getElementById('livePreviewer');
+            var documentFrame = livePreviewer.contentDocument || livePreviewer.contentWindow.document;
+            
+            if(oldHtml != editor.getValue()) {
+                oldHtml = editor.getValue();
+                documentFrame.open();
+                documentFrame.write(oldHtml);
+                documentFrame.close();
+            }
+        }
+
+        var rhymeCompleter = {
+            getCompletions: function(editor, session, pos, prefix, callback) {
+                if (prefix.length === 0) {
+                    callback(null, []);
+                    return;
+                }
+                $.getJSON(
+                    "http://rhymebrain.com/talk?function=getRhymes&word=" + prefix,
+                    function(wordList) {
+                        // wordList like [{"word":"flow","freq":24,"score":300,"flags":"bc","syllables":"1"}]
+                        callback(null, wordList.map(function(ea) {
+                            return { name: ea.word, value: ea.word, score: ea.score, meta: "rhyme" };
+                        }));
+                    });
+            }
+        };
+        
+        langTools.addCompleter(rhymeCompleter);
+
+        $('#goVisualizerTree').on('click', function () {
+            var panel = $(this);
+            if(panel.hasClass('animated')) {
+                refreshVizualizer("tree");
+            }
+            else {
+                openVisualizer(panel, "tree");
+                
+                $('.editor-visualizer').stop().animate({
+                    right: panel.hasClass('animated') ? 0 : "-45%"
+                }, 1500);
+            }
+        });
+        
+        $('#goVisualizerGraph').on('click', function () {
+            var panel = $(this);
+            if (panel.hasClass('animated')) {
+                refreshVizualizer("graph");
+            }
+            else {
+                openVisualizer(panel, "graph");
+
+                $('.editor-visualizer').stop().animate({
+                    right: panel.hasClass('animated') ? 0 : "-45%"
+                }, 1500);
+            }
+        });
+        
+        $('#goVisualizerHyperTree').on('click', function () {
+            var panel = $(this);
+            if (panel.hasClass('animated')) {
+                refreshVizualizer("hypertree");
+            }
+            else {
+                openVisualizer(panel, "hypertree");
+
+                $('.editor-visualizer').stop().animate({
+                    right: panel.hasClass('animated') ? 0 : "-45%"
+                }, 1500);
+            }
+        });
+
+        function openVisualizer(panel, typeVisualizer) {
+            panel.addClass('animated');
+            $('#infovis').html('');
+            $('#id-list').html('');
+            $('#log').html('');
+
+            $.ajax({
+                type: 'get',
+                url: '/editor/GetRdf',
+                dataType: 'json',
+                data: 'text=' + encodeURIComponent(editor.getValue()),
+                success: function (data) {
+                    jsonRdf = JSON.parse(data);
+                    convertToTree(jsonRdf, typeVisualizer);
+                }
+            });
+        }
+
+        
+    </script>
+}

@@ -5,12 +5,17 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>@ViewBag.Title</title>
+        
+        <link type="text/css" href="/Content/jit/base.css" rel="stylesheet" />
+        <link type="text/css" href="/Content/jit/Spacetree.css" rel="stylesheet" />
+        <link type="text/css" href="/Content/jit/RGraph.css" rel="stylesheet" />
+
         @Styles.Render("~/Content/bootstrap")
         @Styles.Render("~/Content/css")
 
         @Scripts.Render("~/bundles/modernizr")
     </head>
-    <body>
+    <body class="@ViewBag.Classes">
         <div class="site-wrapper">
             <div class="site-wrapper-inner">
                 @RenderBody()

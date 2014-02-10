@@ -63,9 +63,17 @@ textarea {
 
 /* Styles for the rest of the website - customizations
 -----------------------------------------------------------*/
+
+.radio, .checkbox {
+    margin-top: 0;
+}
+
+
+
 html, body {
     height: 100%;
     background-color: #fafafa;
+    overflow: hidden;
 }
 body {
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
@@ -77,9 +85,23 @@ body {
     min-height: 100%;
     width: 100%;
 }
-.site-wrapper-inner {
+.home .site-wrapper-inner {
     display: table-cell;
     vertical-align: middle;
+}
+.editor .site-wrapper-inner {
+    display: block;
+}
+
+.form-preset {
+    width: 350px;
+    margin: auto;
+}
+@media (max-width: 715px)
+{
+    .form-preset {
+        width: 100%;
+    }
 }
 
 h1.heading {
@@ -111,4 +133,58 @@ form#inputForm button.btn-primary {
 form#inputForm button:hover,
 form#inputForm button:focus {
     outline: none;
+}
+
+.navbar {
+    z-index: 99;
+    border-radius: 0;
+}
+.navbar-brand {
+    font-size: 24px;
+    padding: 15px 25px;
+}
+.navbar > .container .navbar-brand, .navbar > .container-fluid .navbar-brand {
+    margin-left: -20px;
+}
+
+.editor-preview {
+    position: fixed;
+    top: 0;
+    height: 65%;
+    width: 100%;
+    /*overflow: auto;*/
+}
+.editor-preview #livePreviewer {
+    width: 100%;
+    height: 100%;
+    border: 0 none;
+    padding-top: 50px;
+}
+.editor-textarea {
+    position: fixed;
+    bottom: 0;
+    height: 35%;
+    width: 100%;
+}
+.editor-textarea #liveEditor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.editor-visualizer {
+    background: #cbd2ba;
+    position: fixed;
+    height: 65%;
+    width: 45%;
+    right: -45%;
+    top: 0;
+}
+.editor-visualizer input {
+    display: none;
+}
+
+.ace_editor {
+    border-radius: 0;
 }

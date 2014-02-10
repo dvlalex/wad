@@ -6,6 +6,8 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using WebMatrix.WebData;
+using data.entity;
+using data.repository;
 using data.service;
 using data.entity;
 using wad.Models;
@@ -29,6 +31,7 @@ namespace wad.Controllers
         // GET: /Home/
         public ActionResult Index()
         {
+            ViewBag.Classes = "home";
             return View();
         }
 
@@ -123,6 +126,9 @@ namespace wad.Controllers
             #endregion
             // aici il aplici pe main
             return Json(new { content = joinedHtml.content, listofsnippets = joinedHtml.listOfSnippets});
+
+            //add html to database attached to current user session
+            //return Json(new {html = result});
         }
 
         [Authorize]
