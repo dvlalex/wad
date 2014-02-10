@@ -12,7 +12,7 @@
         
         <div class="collapse navbar-collapse">
             <div class="navbar-left">
-                <a class="btn btn-success navbar-btn">Save</a>
+                <a class="btn btn-success navbar-btn" id="goSaveItem">Save</a>
             </div>
             <div class="navbar-right">
                 <a class="btn btn-info navbar-btn">Export</a>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="editor-textarea">
-            <code id="liveEditor"></code>
+            <code id="liveEditor">@ViewBag.HtmlContent</code>
         </div>
         
     </div>
@@ -87,6 +87,7 @@
         editor.getSession().on('change', function (e) {
             updateFrame();
         });
+        updateFrame();
 
         function updateFrame() {
             var livePreviewer = document.getElementById('livePreviewer');
@@ -100,27 +101,52 @@
             }
         }
 
-        var rhymeCompleter = {
+        var schemaCompleter = {
             getCompletions: function(editor, session, pos, prefix, callback) {
                 if (prefix.length === 0) {
                     callback(null, []);
                     return;
                 }
                 $.getJSON(
-                    "http://rhymebrain.com/talk?function=getRhymes&word=" + prefix,
+                    "http://localhost:7694/api/schema?contains=" + prefix,
                     function(wordList) {
                         // wordList like [{"word":"flow","freq":24,"score":300,"flags":"bc","syllables":"1"}]
                         callback(null, wordList.map(function(ea) {
-                            return { name: ea.word, value: ea.word, score: ea.score, meta: "rhyme" };
+                            return { name: ea.word, value: ea.word, score: ea.score, meta: "schema" };
                         }));
                     });
             }
         };
         
-        langTools.addCompleter(rhymeCompleter);
+        langTools.addCompleter(schemaCompleter);
+
+        $('#goSaveItem').on('click', function() {
+            var panel = $('.editor-visualizer');
+
+            $.ajax({
+                type: 'get',
+                url: '/editor/SaveItem/@ViewBag.HtmlId',
+                dataType: 'json',
+                data: 'text=' + encodeURIComponent(editor.getValue()),
+                success: function (data) {
+                    console.log(data);
+                    
+                    openVisualizer(panel, "none");
+
+                    if (panel.hasClass('animated')) {
+                        panel.removeClass('animated');
+                    }
+
+                    $('.editor-visualizer').stop().animate({
+                        right: panel.hasClass('animated') ? 0 : "-45%"
+                    }, 1500);
+                }
+            });
+            
+        });
 
         $('#goVisualizerTree').on('click', function () {
-            var panel = $(this);
+            var panel = $('.editor-visualizer');
             if(panel.hasClass('animated')) {
                 refreshVizualizer("tree");
             }
@@ -134,7 +160,7 @@
         });
         
         $('#goVisualizerGraph').on('click', function () {
-            var panel = $(this);
+            var panel = $('.editor-visualizer');
             if (panel.hasClass('animated')) {
                 refreshVizualizer("graph");
             }
@@ -148,7 +174,7 @@
         });
         
         $('#goVisualizerHyperTree').on('click', function () {
-            var panel = $(this);
+            var panel = $('.editor-visualizer');
             if (panel.hasClass('animated')) {
                 refreshVizualizer("hypertree");
             }
@@ -163,13 +189,11 @@
 
         function openVisualizer(panel, typeVisualizer) {
             panel.addClass('animated');
-            $('#infovis').html('');
-            $('#id-list').html('');
-            $('#log').html('');
+            
 
             $.ajax({
                 type: 'get',
-                url: '/editor/GetRdf',
+                url: '/editor/GetRdfFor/@ViewBag.HtmlId',
                 dataType: 'json',
                 data: 'text=' + encodeURIComponent(editor.getValue()),
                 success: function (data) {
@@ -179,6 +203,13 @@
             });
         }
 
+        $(".editor-textarea").resizable({
+            ghost: true,
+            helper: 'resizable-helper',
+            grid: [0, 30],
+            handles: "n",
+            maxHeight: "35%"
+        });
         
     </script>
 }

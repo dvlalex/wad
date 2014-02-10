@@ -28,15 +28,15 @@
                                     microData
                                 </label>
                             </div>
-                            <div class="radio radio-inline">
+                            @*<div class="radio radio-inline">
                                 <label>
                                     @Html.RadioButtonFor(m => m.Type, wad.Models.TypeModel.MicroFormat)
                                     microFormat
                                 </label>
-                            </div>
+                            </div>*@
                             <div class="radio radio-inline">
                                 <label>
-                                    @Html.RadioButtonFor(m => m.Type, wad.Models.TypeModel.Rdfa)
+                                    @Html.RadioButtonFor(m => m.Type, wad.Models.TypeModel.Rdfa, new { Checked = "checked" })
                                     RDFa
                                 </label>
                             </div>

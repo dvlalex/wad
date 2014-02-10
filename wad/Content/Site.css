@@ -135,6 +135,10 @@ form#inputForm button:focus {
     outline: none;
 }
 
+.resizable-helper {
+    z-index: 99;
+}
+
 .navbar {
     z-index: 99;
     border-radius: 0;

@@ -61,7 +61,8 @@ namespace wad.Controllers
             var item = new HtmlItem()
                         {
                             User = _membershipService.GetUserSession(GetLoggedUser()),
-                            Snippets = new List<HtmlSnippet>()
+                            Snippets = new List<HtmlSnippet>(),
+                            Type = (HtmlType) model.Type
                         };
 
             _htmlItemService.CreateHtmlItem(item);
@@ -78,8 +79,8 @@ namespace wad.Controllers
                 mainhtml = mainhtml.Replace(html.Value, 
                     string.Format("<div contentid=\"{0}\"></div>", snippet.Id));
                 _htmlItemService.UpdateHtmlItem(item);
-
             }
+
             //aici ednd
             var sn = new HtmlSnippet()
             {
@@ -94,37 +95,8 @@ namespace wad.Controllers
             HtmlToSend joinedHtml = HtmlSnippetHelper.JoinHTML(item.Snippets);
 
             //return redirect item.id
+            return RedirectToAction("Index", "Editor", new { id = item.Id });
 
-            #region ToBeMoved
-            HtmlReceived  received = new HtmlReceived {
-                data = joinedHtml.content,
-                pageid = item.Id
-            };
-            string main;
-            var res = GetAllSnippets(joinedHtml.content);
-            
-            var listOfIds = new List<string>();
-            main = res.Last();
-            foreach (var x in res.Where(s => s != res.Last()))
-            {
-                HtmlNode hnode = HtmlNode.CreateNode(x);
-                string id = hnode.Attributes["data-snippetid"].Value;
-                listOfIds.Add(id);
-                hnode.Attributes.Remove("data-snippetid");
-                var snipp = _htmlSnippetService.RetrieveHtmlSnippet(int.Parse(id));
-                snipp.HtmlCode = hnode.OuterHtml;
-                _htmlSnippetService.UpdateHtmlSnippet(snipp);
-                main = main.Replace(x, string.Format("<div contentid=\"{0}\"></div>", id));
-
-            }
-            HtmlItem hitem = _htmlItemService.RetrieveHtmlItem(received.pageid);
-            foreach (var sni in hitem.Snippets.Where(i => i.DivId != 0))
-            {
-                if (!listOfIds.Contains(sni.Id.ToString()))
-                    _htmlSnippetService.DeleteHtmlSnippet(sni.Id);
-            }
-            #endregion
-            // aici il aplici pe main
             return Json(new { content = joinedHtml.content, listofsnippets = joinedHtml.listOfSnippets});
 
             //add html to database attached to current user session

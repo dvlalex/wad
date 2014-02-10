@@ -12,12 +12,15 @@ function convertToTree(data, typeVisualizer) {
         }
     });
 
-    if (typeVisualizer == "tree") init_tree();
-    else if (typeVisualizer == "graph") init_graph();
-    else if (typeVisualizer == "hypertree") init_hypertree();
+    refreshVizualizer(typeVisualizer);
 }
 
 function refreshVizualizer(typeVisualizer) {
+    $('#infovis').html('');
+    $('#id-list').html('');
+    $('#log').html('');
+    $('#inner-details').html('');
+    
     if (typeVisualizer == "tree") init_tree();
     else if (typeVisualizer == "graph") init_graph();
     else if (typeVisualizer == "hypertree") init_hypertree();

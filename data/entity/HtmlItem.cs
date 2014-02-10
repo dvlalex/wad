@@ -11,5 +11,13 @@ namespace data.entity
     {
         public virtual UserSession User { get; set; }
         public virtual List<HtmlSnippet> Snippets { get; set; }
+        public HtmlType Type { get; set; }
+    }
+
+    public enum HtmlType
+    {
+        MicroData = 0,
+        MicroFormat = 1,
+        Rdfa = 2
     }
 }
