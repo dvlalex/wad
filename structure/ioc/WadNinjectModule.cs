@@ -20,10 +20,14 @@ namespace structure.ioc
 
             //Repo's
             this.Bind<IUserSessionRepository>().To<UserSessionRepository>().InRequestScope();
+            this.Bind<IHtmlSnippetRepository>().To<HtmlSnippetRepository>().InRequestScope();
+            this.Bind<IHtmlItemRepository>().To<HtmlItemRepository>().InRequestScope();
 
             //Serv's
             this.Bind<IUserSessionService>().To<UserSessionService>().InRequestScope();
             this.Bind<IMembershipService>().To<MembershipService>().InRequestScope();
+            this.Bind<IHtmlSnippetService>().To<HtmlSnippetService>().InRequestScope();
+            this.Bind<IHtmlItemService>().To<HtmlItemService>().InRequestScope();
         }
     }
 

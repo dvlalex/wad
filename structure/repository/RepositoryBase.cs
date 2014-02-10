@@ -26,7 +26,7 @@ namespace structure.repository
             private set;
         }
 
-        protected WadDbContext DataContext
+        public WadDbContext DataContext
         {
             get { return _dataContext ?? (_dataContext = DatabaseFactory.Get()); }
         }

@@ -11,6 +11,7 @@ namespace data.service
         String CreateUserAndLogin();
         Boolean Logout();
         int GetUserSessionId(String userhash);
+        UserSession GetUserSession(string userhash);
     }
 
     public class MembershipService : IMembershipService

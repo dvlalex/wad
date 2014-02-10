@@ -20,6 +20,8 @@ namespace structure.sql
         {
             //model table bindings
             modelBuilder.Entity<UserSession>().ToTable("UserSession");
+            modelBuilder.Entity<HtmlSnippet>().ToTable("HtmlSnippet");
+            modelBuilder.Entity<HtmlItem>().ToTable("HtmlItem");
         }
     }
 
