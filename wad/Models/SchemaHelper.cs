@@ -49,6 +49,15 @@ namespace wad.Models
         {
             return Types.Select(t => t.id).ToList();
         }
+
+        public static List<string> GetAllTypesAndProperties()
+        {
+            List<string> types = new List<string>();
+            types.AddRange(Types.Select(t => t.id));
+            types.AddRange(Properties.Select(p => p.id));
+
+            return types;
+        }
         
     }
     

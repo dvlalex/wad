@@ -12,10 +12,20 @@
         
         <div class="collapse navbar-collapse">
             <div class="navbar-left">
-                <a class="btn btn-success navbar-btn" id="goSaveItem">Save</a>
+                <a class="btn btn-success navbar-btn @ViewBag.AdditionalClasses" id="goSaveItem">Save</a>
+                &nbsp; &nbsp;
+                <!--<a href="/Editor/Fork/ViewBag.HtmlId" class="btn btn-success navbar-btn" id="goFormItem">Fork</a>-->
             </div>
             <div class="navbar-right">
-                <a class="btn btn-info navbar-btn">Export</a>
+                <div class="btn-group">
+                    <a class="btn btn-info navbar-btn dropdown-toggle" data-toggle="dropdown">
+                        Export <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="/Editor/ExportRdf/@ViewBag.HtmlId" id="goExportRdf">RDF</a></li>
+                        <li><a href="/Editor/ExportTurtle/@ViewBag.HtmlId" id="goExportTurtle">Turtle</a></li>
+                    </ul>
+                </div>>
                 &nbsp; &nbsp;
                 <div class="btn-group">
                   <a class="btn btn-primary navbar-btn dropdown-toggle" data-toggle="dropdown">
@@ -77,7 +87,7 @@
         var langTools = ace.require("ace/ext/language_tools");
         var editor = ace.edit("liveEditor");
 
-        editor.setTheme("ace/theme/twilight");
+        editor.setTheme("ace/theme/ambiance");
         editor.getSession().setMode("ace/mode/html");
         editor.setOptions({
             enableBasicAutocompletion: true,
@@ -209,6 +219,11 @@
             grid: [0, 30],
             handles: "n",
             maxHeight: "35%"
+        }).on("resizestart", function (event, ui) {
+            $('.editor-preview').addClass('overlay');
+        }).on("resizestop", function (event, ui) {
+            $('.editor-preview').removeClass('overlay');
+            editor.resize();
         });
         
     </script>

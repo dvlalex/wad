@@ -3,14 +3,24 @@
 function convertToTree(data, typeVisualizer) {
     jsonGraph = { id: "nodDocument", name: "document", data: {}, children: [] };
 
-    $.each(data["@graph"], function() {
-        if(this["@id"] != "") {
-            var idRoot = { id: this["@id"], name: this["@id"], data: { }, children: [] };
-            convertRecursive(this, idRoot);
-            
+    if (typeof (data["@graph"]) != "undefined") {
+        $.each(data["@graph"], function () {
+            if (this["@id"] != "") {
+                var idRoot = { id: this["@id"], name: this["@id"], data: {}, children: [] };
+                convertRecursive(this, idRoot);
+
+                jsonGraph.children.push(idRoot);
+            }
+        });
+    }
+    else {
+        $.each(data["md:item"], function (i, val) {
+            var idRoot = { id: i, name: i, data: {}, children: [] };
+            convertRecursive(val, idRoot);
+
             jsonGraph.children.push(idRoot);
-        }
-    });
+        });
+    }
 
     refreshVizualizer(typeVisualizer);
 }

@@ -158,6 +158,16 @@ form#inputForm button:focus {
     width: 100%;
     /*overflow: auto;*/
 }
+.editor-preview.overlay:before {
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: " ";
+    display: block;
+}
 .editor-preview #livePreviewer {
     width: 100%;
     height: 100%;
@@ -167,8 +177,10 @@ form#inputForm button:focus {
 .editor-textarea {
     position: fixed;
     bottom: 0;
+    left: 0 !important;
     height: 35%;
     width: 100%;
+    z-index: 4;
 }
 .editor-textarea #liveEditor {
     position: absolute;

@@ -16,10 +16,12 @@ namespace wad.Controllers
     {
         private readonly IHtmlSnippetService _htmlSnippetService;
         private readonly IHtmlItemService _htmlItemService;
-        public EditorController(IHtmlItemService htmlItemService, IHtmlSnippetService htmlSnippetService)
+        private readonly IMembershipService _memberShipService;
+        public EditorController(IHtmlItemService htmlItemService, IHtmlSnippetService htmlSnippetService, IMembershipService membershipService)
         {
             _htmlItemService = htmlItemService;
             _htmlSnippetService = htmlSnippetService;
+            _memberShipService = membershipService;
         }
 
         //
@@ -32,6 +34,12 @@ namespace wad.Controllers
             {
                 var item = _htmlItemService.RetrieveHtmlItem(id);
                 var joinedHtml = HtmlSnippetHelper.JoinHTML(item.Snippets);
+                var userToBeResolved = _memberShipService.GetUserSession(User.Identity.Name);
+
+                if (item.User != userToBeResolved)
+                {
+                    ViewBag.AdditionalClasses = "disabled";
+                }
 
                 ViewBag.HtmlContent = joinedHtml.content;
                 ViewBag.HtmlId = item.Id;
@@ -40,6 +48,11 @@ namespace wad.Controllers
                 ViewBag.HtmlContent = "";
 
             return View();
+        }
+
+        public ActionResult Fork(int id = 0)
+        {
+            return Json(new { });
         }
 
         [ValidateInput(false)]
@@ -73,6 +86,14 @@ namespace wad.Controllers
         {
             if(id != 0)
             {
+                var itemToBeResolved = _htmlItemService.RetrieveHtmlItem(id);
+                var userToBeResolved = _memberShipService.GetUserSession(User.Identity.Name);
+
+                if(itemToBeResolved.User != userToBeResolved)
+                {
+                    return Json(new { message = "notSaved" }, JsonRequestBehavior.AllowGet);
+                }
+
                 HtmlReceived received = new HtmlReceived
                 {
                     data = text,
@@ -130,6 +151,104 @@ namespace wad.Controllers
             }
 
             return Json(new { message = "notSaved" }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ExportRdf(int id)
+        {
+            if (id != 0)
+            {
+                var item = _htmlItemService.RetrieveHtmlItem(id);
+                var joinedHtml = HtmlSnippetHelper.JoinHTML(item.Snippets);
+
+                StringBuilder sb = new StringBuilder();
+                string[] parts = joinedHtml.content.Split(new char[] { ' ', '\n', '\t', '\r', '\f', '\v', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                int size = parts.Length;
+                for (int i = 0; i < size; i++)
+                    sb.AppendFormat("{0} ", parts[i]);
+                joinedHtml.content = sb.ToString();
+
+                var cl = new HttpClient { BaseAddress = new Uri("http://www.w3.org/") };
+                var htmltext = Uri.EscapeDataString(Server.HtmlDecode(joinedHtml.content));
+                HttpResponseMessage response;
+                if ((TypeModel)item.Type == TypeModel.Rdfa)
+                {
+                    response = cl.GetAsync("2012/pyRdfa/extract?format=xml&text=" + htmltext).Result;
+                }
+                else
+                {
+                    response = cl.GetAsync("2012/pyMicrodata/extract?format=xml&text=" + htmltext).Result;
+                }
+
+                var rdf = response.Content.ReadAsStringAsync().Result;
+
+                /*StringBuilder sb2 = new StringBuilder();
+                string[] parts2 = rdf.Split(new char[] { ' ', '\n', '\t', '\r', '\f', '\v', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                int size2 = parts2.Length;
+                for (int i = 0; i < size2; i++)
+                    sb2.AppendFormat("{0} ", parts2[i]);*/
+
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=rdfFile.xml");
+                Response.ContentType = "text/xml";
+
+                // Write all my data
+                Response.Write(/*sb2.ToString()*/rdf);
+                Response.End();
+
+                // Not sure what else to do here
+                return Content(String.Empty);
+            }
+
+            return Json(new { });
+        }
+
+        public ActionResult ExportTurtle(int id)
+        {
+            if (id != 0)
+            {
+                var item = _htmlItemService.RetrieveHtmlItem(id);
+                var joinedHtml = HtmlSnippetHelper.JoinHTML(item.Snippets);
+
+                StringBuilder sb = new StringBuilder();
+                string[] parts = joinedHtml.content.Split(new char[] { ' ', '\n', '\t', '\r', '\f', '\v', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                int size = parts.Length;
+                for (int i = 0; i < size; i++)
+                    sb.AppendFormat("{0} ", parts[i]);
+                joinedHtml.content = sb.ToString();
+
+                var cl = new HttpClient { BaseAddress = new Uri("http://www.w3.org/") };
+                var htmltext = Uri.EscapeDataString(Server.HtmlDecode(joinedHtml.content));
+                HttpResponseMessage response;
+                if ((TypeModel)item.Type == TypeModel.Rdfa)
+                {
+                    response = cl.GetAsync("2012/pyRdfa/extract?format=turtle&text=" + htmltext).Result;
+                }
+                else
+                {
+                    response = cl.GetAsync("2012/pyMicrodata/extract?format=turtle&text=" + htmltext).Result;
+                }
+
+                var rdf = response.Content.ReadAsStringAsync().Result;
+
+                /*StringBuilder sb2 = new StringBuilder();
+                string[] parts2 = rdf.Split(new char[] { ' ', '\n', '\t', '\r', '\f', '\v', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+                int size2 = parts2.Length;
+                for (int i = 0; i < size2; i++)
+                    sb2.AppendFormat("{0} ", parts2[i]);*/
+
+                Response.Clear();
+                Response.AddHeader("Content-Disposition", "attachment; filename=turtleFile.ttl");
+                Response.ContentType = "text/txt";
+
+                // Write all my data
+                Response.Write(/*sb2.ToString()*/rdf);
+                Response.End();
+
+                // Not sure what else to do here
+                return Content(String.Empty);
+            }
+
+            return Json(new { });
         }
 
         [ValidateInput(false)]

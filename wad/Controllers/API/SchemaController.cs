@@ -40,8 +40,11 @@ namespace wad.Controllers.API
         {
             try
             {
-                return Request.CreateResponse(statusCode: HttpStatusCode.OK,
+                /*return Request.CreateResponse(statusCode: HttpStatusCode.OK,
                                             value: SchemaHelper.GetAllTypes().Where(p => p.ToLower()
+                                                .Contains(contains.ToLower())).Select(p => new { word = p, score = 300 }));*/
+                return Request.CreateResponse(statusCode: HttpStatusCode.OK,
+                                            value: SchemaHelper.GetAllTypesAndProperties().Where(p => p.ToLower()
                                                 .Contains(contains.ToLower())).Select(p => new { word = p, score = 300 }));
             }
             catch
